@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Actions\Fortify;
+
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Laravel\Fortify\Contracts\CreatesNewUsers;
+use Laravel\Jetstream\Jetstream;
+
+class CreateNewUser implements CreatesNewUsers
+{
+    use PasswordValidationRules;
+
+    public function create(array $input): User
+    {
+        Validator::make($input, [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => $this->passwordRules(),
+            'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
+            'tipo_usuario' => ['required', 'in:estudiante,propietario'],
+        ])->validate();
+
+        $rolId = match ($input['tipo_usuario']) {
+            'estudiante' => 1,
+            'propietario' => 2,
+            default => throw new \InvalidArgumentException('Tipo de usuario inválido'),
+        };
+
+        return User::create([
+            'name' => $input['name'],
+            'email' => $input['email'],
+            'password' => Hash::make($input['password']),
+            'id_rol' => $rolId,
+        ]);
+    }
+}
