@@ -28,7 +28,7 @@ Route::get('/register', function () {
 })->name('register');
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('inicio');
 });
 
 Route::middleware([
