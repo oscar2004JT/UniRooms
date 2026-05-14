@@ -1,61 +1,168 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# UniRooms
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+UniRooms es una plataforma web orientada al alojamiento universitario. El proyecto conecta estudiantes que buscan habitación con propietarios que desean publicar y administrar sus espacios, facilitando la búsqueda, visualización de detalles, gestión de favoritos y envío de solicitudes de reserva.
 
-## About Laravel
+La aplicación fue desarrollada con Laravel y contempla flujos diferenciados para estudiantes y propietarios, incluyendo autenticación, perfiles, publicación de habitaciones, consulta de solicitudes y administración básica del proceso de arriendo.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Objetivo del proyecto
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+El propósito de UniRooms es centralizar en una sola plataforma el proceso de búsqueda y oferta de habitaciones o pensiones para estudiantes, especialmente en zonas universitarias. El sistema busca hacer más confiable la conexión entre ambas partes mediante información estructurada, perfiles, filtros de búsqueda y control de reservas.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Funcionalidades principales
 
-## Learning Laravel
+### Para estudiantes
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- Registro e inicio de sesión.
+- Exploración de habitaciones disponibles.
+- Filtros por zona, tipo de habitación y precio.
+- Vista de detalle de cada habitación.
+- Consulta del perfil público del propietario.
+- Guardado de habitaciones en favoritos.
+- Envío de solicitudes de reserva.
+- Visualización y cancelación de reservas realizadas.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Para propietarios
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- Registro e inicio de sesión.
+- Publicación de nuevas habitaciones.
+- Carga de imágenes para las habitaciones.
+- Gestión de habitaciones publicadas.
+- Visualización detallada de cada publicación.
+- Edición de información de la habitación.
+- Revisión de solicitudes de reserva recibidas.
+- Aceptación o rechazo de solicitudes.
+- Consulta del perfil del estudiante asociado a una reserva.
 
-## Laravel Sponsors
+## Tecnologías utilizadas
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- `PHP 8.2`
+- `Laravel 12`
+- `Laravel Jetstream`
+- `Laravel Fortify`
+- `Laravel Sanctum`
+- `Livewire`
+- `Blade`
+- `Tailwind CSS`
+- `Vite`
+- `MySQL`
+- `Cloudinary` para almacenamiento de imágenes
 
-### Premium Partners
+## Estructura general del sistema
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+El proyecto está organizado bajo una arquitectura MVC usando Laravel:
 
-## Contributing
+- `app/Http/Controllers`: lógica de negocio para habitaciones, favoritos, reservas y gestión del propietario.
+- `app/Models`: modelos del dominio como `Pension`, `Arriendo`, `Favorita`, `Persona`, `Estudiante` y `Propietario`.
+- `database/migrations`: definición de la base de datos y relaciones entre entidades.
+- `resources/views`: vistas Blade del frontend para estudiantes, propietarios, autenticación y perfiles.
+- `routes/web.php`: rutas principales de navegación y acciones del sistema.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Modelo de negocio implementado
 
-## Code of Conduct
+UniRooms maneja dos roles principales:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- `Estudiante`: busca habitaciones, guarda favoritas y solicita reservas.
+- `Propietario`: publica habitaciones, administra sus anuncios y responde a solicitudes.
 
-## Security Vulnerabilities
+Entre las entidades más importantes del sistema se encuentran:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- `users` y `roles`
+- `persona`, `estudiante` y `propietario`
+- `pension`
+- `tipo_habitacion`, `tipo_servicio`, `tipo_estado` y `zona`
+- `favorita`
+- `arriendo`
 
-## License
+Esto permite modelar tanto la información personal de los usuarios como la operación funcional del sistema de alojamiento.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Mi participación en el desarrollo
+
+Participé en todas las fases del desarrollo del proyecto, no solo en la programación final. Mi aporte abarcó tanto el análisis como el diseño, la implementación y el ajuste funcional del sistema.
+
+### Levantamiento y análisis de requisitos
+
+- Participé en la identificación de necesidades del sistema.
+- Ayudé a definir los requerimientos funcionales y la lógica de los roles.
+- Colaboré en la definición de los flujos principales para estudiantes y propietarios.
+
+### Diseño y construcción de la base de datos
+
+- Participé en el modelado de entidades y relaciones.
+- Apoyé la creación de la estructura de la base de datos.
+- Trabajé en la implementación de migraciones para reflejar el diseño lógico del sistema.
+
+### Desarrollo backend
+
+- Implementé lógica del servidor usando Laravel.
+- Trabajé en controladores, modelos, validaciones, middleware y rutas.
+- Participé en la gestión de autenticación, reservas, favoritos y administración de habitaciones.
+
+### Desarrollo frontend
+
+- Participé en la construcción de interfaces con Blade, Tailwind CSS y recursos de frontend del proyecto.
+- Apoyé el diseño y desarrollo de vistas para estudiantes y propietarios.
+- Trabajé en formularios, navegación, listados, vistas de detalle y flujos de interacción del usuario.
+
+### Integración y pruebas funcionales
+
+- Colaboré en la conexión entre frontend, backend y base de datos.
+- Realicé validaciones funcionales de los flujos principales del sistema.
+- Apoyé la corrección de errores y ajustes durante el proceso de desarrollo.
+
+En resumen, participé de manera integral en el proyecto: desde la obtención de requisitos, el diseño de la base de datos y la estructura del sistema, hasta el desarrollo frontend, backend, integración y puesta en funcionamiento de la aplicación.
+
+## Instalación y ejecución local
+
+1. Clonar el repositorio.
+2. Instalar dependencias de PHP:
+
+```bash
+composer install
+```
+
+3. Instalar dependencias de frontend:
+
+```bash
+npm install
+```
+
+4. Crear el archivo de entorno:
+
+```bash
+copy .env.example .env
+```
+
+5. Generar la clave de Laravel:
+
+```bash
+php artisan key:generate
+```
+
+6. Configurar la base de datos en `.env`.
+7. Ejecutar migraciones:
+
+```bash
+php artisan migrate
+```
+
+8. Compilar assets:
+
+```bash
+npm run build
+```
+
+9. Iniciar el servidor:
+
+```bash
+php artisan serve
+```
+
+## Consideraciones
+
+- El proyecto usa integración con `Cloudinary` para el manejo de imágenes.
+- Algunas vistas y flujos están orientados específicamente a estudiantes y propietarios mediante middleware y control de roles.
+- El sistema está pensado como una solución académica o de portafolio enfocada en alojamiento universitario.
+
+## Estado actual
+
+El proyecto cuenta con una base funcional que cubre autenticación, publicación de habitaciones, búsqueda, favoritos y solicitudes de reserva, sirviendo como evidencia del desarrollo completo de una aplicación web con responsabilidades tanto de análisis como de implementación.
