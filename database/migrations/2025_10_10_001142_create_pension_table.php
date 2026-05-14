@@ -20,7 +20,7 @@ return new class extends Migration
             $table->integer('capacidad');
             $table->string('ubicacion_especifica', 255);
             $table->boolean('disponible')->default(true);
-            $table->string('link_foto')->nullable();
+            $table->text('link_foto');
             
             $table->unsignedInteger('id_tipo_habitacion');
             $table->foreign('id_tipo_habitacion')->references('id')->on('tipo_habitacion')->onDelete('cascade');

@@ -21,7 +21,7 @@
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex items-center justify-between h-20">
                 <!-- Logo -->
-                <a href="#" class="flex items-center gap-3">
+                <a href="{{ route('inicio') }}" class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-md bg-white/20 flex items-center justify-center">
                         <i data-lucide="home" class="text-white"></i>
                     </div>

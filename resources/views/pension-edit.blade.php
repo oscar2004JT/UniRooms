@@ -1,10 +1,10 @@
-{{-- resources/views/addroom.blade.php --}}
+{{-- resources/views/pension-edit.blade.php --}}
 <!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Publicar Habitación — UniRooms</title>
+  <title>Editar Habitación — UniRooms</title>
 
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -12,7 +12,7 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- (Opcional) mismos CSS globales que las demás vistas -->
+  <!-- CSS globales -->
   <link rel="stylesheet" href="{{ asset('css/globals.css') }}">
   <link rel="stylesheet" href="{{ asset('css/components.css') }}">
   <link rel="stylesheet" href="{{ asset('css/pages.css') }}">
@@ -27,17 +27,48 @@
       --radius: 0.5rem;
     }
 
-    body{ background: #fbfdff; color: var(--foreground); font-family: Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial; }
+    body{
+      background: #fbfdff;
+      color: var(--foreground);
+      font-family: Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+    }
 
-    .card{ background: #fff; border-radius: 12px; border: 1px solid #eef2f7; box-shadow: 0 1px 2px rgba(16,24,40,0.03); }
-    .input, .select, textarea.input{ width:100%; border:1px solid #e6edf7; border-radius:8px; padding:0.75rem 1rem; background:#fbfdff; font-size:0.95rem; }
+    .card{
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #eef2f7;
+      box-shadow: 0 1px 2px rgba(16,24,40,0.03);
+    }
+    .input, .select, textarea.input{
+      width:100%;
+      border:1px solid #e6edf7;
+      border-radius:8px;
+      padding:0.75rem 1rem;
+      background:#fbfdff;
+      font-size:0.95rem;
+    }
     h1{ font-size:1.25rem; font-weight:600; }
     h3{ font-size:1rem; font-weight:600; }
-    .btn{ display:inline-flex; align-items:center; gap:0.5rem; padding:0.6rem 0.9rem; border-radius:10px; border:1px solid #e6edf7; background:white; cursor:pointer; }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      gap:0.5rem;
+      padding:0.6rem 0.9rem;
+      border-radius:10px;
+      border:1px solid #e6edf7;
+      background:white;
+      cursor:pointer;
+    }
     .btn-primary{ background:var(--primary); color:white; border-color:var(--primary); }
     .btn-outline{ background:white; color:var(--foreground); }
-    .amenity-active{ background: rgba(35,77,183,0.08); box-shadow: inset 0 0 0 1px rgba(35,77,183,0.06); border-radius:8px; }
-    @media (max-width:640px){ .max-w-800{ padding-left:1rem; padding-right:1rem } }
+    .amenity-active{
+      background: rgba(35,77,183,0.08);
+      box-shadow: inset 0 0 0 1px rgba(35,77,183,0.06);
+      border-radius:8px;
+    }
+    @media (max-width:640px){
+      .max-w-800{ padding-left:1rem; padding-right:1rem }
+    }
   </style>
 </head>
 
@@ -60,7 +91,6 @@
         <!-- NAVIGATION -->
         <nav class="flex items-center gap-3">
           @guest
-            <!-- Solo cuando NO está logueado -->
             <a href="{{ route('login') }}"
                class="ml-4 inline-block bg-transparent border border-white/60 text-white font-medium rounded-md px-4 py-2 hover:bg-white/10 transition">
               Iniciar Sesión
@@ -99,7 +129,6 @@
                   </svg>
                 </button>
 
-                <!-- Dropdown -->
                 <div id="userDropdown"
                      class="hidden absolute right-0 mt-2 w-48 bg-white text-gray-700 rounded-md shadow-lg overflow-hidden z-50">
                   <div class="px-4 py-2 text-sm text-gray-500 border-b">Mi cuenta</div>
@@ -145,7 +174,7 @@
         Inicio
       </a>
 
-      <a href="{{ route('propietario.habitaciones') }}" id="nav-mishabitaciones" class="nav-link">
+      <a href="{{ route('propietario.habitaciones') }}" id="nav-mishabitaciones" class="nav-link active">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
              viewBox="0 0 24 24" fill="none" stroke="currentColor"
              stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -158,8 +187,7 @@
         Mis habitaciones
       </a>
 
-      <!-- ESTA VISTA: Addroom, por eso la marcamos active -->
-      <a href="{{ route('addroom') }}" id="nav-addroom" class="nav-link active">
+      <a href="{{ route('addroom') }}" id="nav-addroom" class="nav-link">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
              viewBox="0 0 24 24" fill="none" stroke="currentColor"
              stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -214,6 +242,15 @@
   {{-- ========================== --}}
   {{--           MAIN             --}}
   {{-- ========================== --}}
+  @php
+    // IDs de amenidades seleccionadas (ajusta según tu modelo/relación)
+    $amenitiesSeleccionadas = isset($amenitiesSeleccionadas)
+      ? (array) $amenitiesSeleccionadas
+      : (isset($pension->amenities) && $pension->amenities instanceof \Illuminate\Support\Collection
+          ? $pension->amenities->pluck('id')->toArray()
+          : []);
+  @endphp
+
   <main class="flex-1">
     <div class="container mx-auto px-4 py-10 max-w-5xl">
       <div style="min-height:100vh; background:transparent;">
@@ -225,15 +262,17 @@
               <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"
                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <path d="M8 12h8"></path>
-                <path d="M12 8v8"></path>
+                <path d="M11 5h10"></path>
+                <path d="M11 9h7"></path>
+                <path d="M11 13h4"></path>
+                <path d="M3 17l3 3 3-3"></path>
+                <path d="M6 18V4"></path>
               </svg>
             </div>
 
-            <h1>Publica tu Habitación</h1>
+            <h1>Editar habitación</h1>
             <p class="mt-2" style="color:var(--muted-foreground); font-size:1.05rem;">
-              Completa la información para atraer a los mejores inquilinos
+              Actualiza la información de tu publicación
             </p>
           </div>
 
@@ -276,8 +315,13 @@
 
             </div>
 
-            <form id="add-room-form" action="{{ route('addroomC') }}" method="POST" enctype="multipart/form-data" novalidate>
+            <form id="edit-room-form"
+                  action="{{ route('pension.update', $pension) }}"
+                  method="POST"
+                  enctype="multipart/form-data"
+                  novalidate>
               @csrf
+              @method('PUT')
 
               {{-- Información básica --}}
               <div class="mb-8">
@@ -297,8 +341,15 @@
                     <label for="room-title" class="block text-sm font-medium mb-2">
                       Título de la habitación *
                     </label>
-                    <input id="room-title" name="nombre" class="input" type="text"
-                           placeholder="Ej: Habitación acogedora cerca del campus" required>
+                    <input
+                      id="room-title"
+                      name="nombre"
+                      class="input"
+                      type="text"
+                      value="{{ old('nombre', $pension->nombre) }}"
+                      placeholder="Ej: Habitación acogedora cerca del campus"
+                      required
+                    >
                     <small style="color:var(--muted-foreground);">
                       Escribe un título atractivo que describa tu habitación
                     </small>
@@ -308,8 +359,15 @@
                     <label for="room-price" class="block text-sm font-medium mb-2">
                       Precio mensual (COP) *
                     </label>
-                    <input id="room-price" name="precio" class="input" type="number"
-                           min="0" placeholder="350000" required>
+                    <input
+                      id="room-price"
+                      name="precio"
+                      class="input"
+                      type="number"
+                      min="0"
+                      value="{{ old('precio', $pension->precio) }}"
+                      required
+                    >
                     <small style="color:var(--muted-foreground);">
                       Precio competitivo según la zona
                     </small>
@@ -336,11 +394,14 @@
                     </label>
                     <select id="room-zone" name="id_zona" class="select input" required>
                       <option value="">Selecciona una zona</option>
-                      <option value="1">Villa marbella</option>
-                      <option value="2">Los laureles</option>
-                      <option value="3">Las malvinas</option>
-                      <option value="4">Santana</option>
-                      <option value="5">Villa marina</option>
+                      @foreach($zonas as $zona)
+                        <option
+                          value="{{ $zona->id }}"
+                          {{ (string)old('id_zona', $pension->id_zona) === (string)$zona->id ? 'selected' : '' }}
+                        >
+                          {{ $zona->nombre }}
+                        </option>
+                      @endforeach
                     </select>
                   </div>
 
@@ -348,8 +409,15 @@
                     <label for="room-location" class="block text-sm font-medium mb-2">
                       Ubicación específica *
                     </label>
-                    <input id="room-location" name="ubicacion_especifica" class="input"
-                           type="text" placeholder="Ej: Cerca al Campus Principal, Estación del Metro" required>
+                    <input
+                      id="room-location"
+                      name="ubicacion_especifica"
+                      class="input"
+                      type="text"
+                      value="{{ old('ubicacion_especifica', $pension->ubicacion_especifica) }}"
+                      placeholder="Ej: Cerca al Campus Principal, Estación del Metro"
+                      required
+                    >
                   </div>
                 </div>
               </div>
@@ -373,10 +441,14 @@
                     </label>
                     <select id="room-type" name="id_tipo_habitacion" class="select input" required>
                       <option value="">Selecciona un tipo</option>
-                      <option value="1">Individual</option>
-                      <option value="2">Compartida</option>
-                      <option value="3">Estudio</option>
-                      <option value="4">Apartamento</option>
+                      @foreach($tiposHabitacion as $tipo)
+                        <option
+                          value="{{ $tipo->id }}"
+                          {{ (string)old('id_tipo_habitacion', $pension->id_tipo_habitacion) === (string)$tipo->id ? 'selected' : '' }}
+                        >
+                          {{ $tipo->nombre }}
+                        </option>
+                      @endforeach
                     </select>
                   </div>
 
@@ -386,10 +458,14 @@
                     </label>
                     <select id="room-occupancy" name="capacidad" class="select input" required>
                       <option value="">Selecciona capacidad</option>
-                      <option value="1">1 persona</option>
-                      <option value="2">2 personas</option>
-                      <option value="3">3 personas</option>
-                      <option value="4">4 personas</option>
+                      @for($i = 1; $i <= 6; $i++)
+                        <option
+                          value="{{ $i }}"
+                          {{ (int)old('capacidad', $pension->capacidad) === $i ? 'selected' : '' }}
+                        >
+                          {{ $i }} persona{{ $i > 1 ? 's' : '' }}
+                        </option>
+                      @endfor
                     </select>
                   </div>
                 </div>
@@ -411,9 +487,14 @@
                   <label for="room-description" class="block text-sm font-medium mb-2">
                     Descripción detallada *
                   </label>
-                  <textarea id="room-description" name="descripcion" class="input" rows="6"
-                            placeholder="Describe tu habitación..." required
-                            style="height:auto; resize:vertical;"></textarea>
+                  <textarea
+                    id="room-description"
+                    name="descripcion"
+                    class="input"
+                    rows="6"
+                    required
+                    style="height:auto; resize:vertical;"
+                  >{{ old('descripcion', $pension->descripcion) }}</textarea>
                   <small style="color:var(--muted-foreground);">
                     Mínimo 100 caracteres para una descripción completa
                   </small>
@@ -433,242 +514,286 @@
                   <span id="amenities-count" class="ml-2 text-sm" style="color:var(--muted-foreground)"></span>
                 </h3>
 
-                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:1rem; background:var(--muted); padding:1.25rem; border-radius:var(--radius);">
-                 <!-- Aquí están los íconos tal como pediste (lista estática). -->
-                <!-- Cada label tendrá la clase .amenity-active cuando su checkbox esté marcado (se activa por JS). -->
-                <label class="amenity-label flex items-center gap-3 p-2 rounded" style="cursor:pointer;">
-  <input type="checkbox" name="amenities[]" value="1" class="amenity-checkbox" style="margin:0;">
-  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary)">
-    <path d="M12 20h.01"></path>
-    <path d="M2 8.82a15 15 0 0 1 20 0"></path>
-    <path d="M5 12.859a10 10 0 0 1 14 0"></path>
-    <path d="M8.5 16.429a5 5 0 0 1 7 0"></path>
-  </svg>
-  <span>Wi-Fi</span>
-</label>
 
-<label class="amenity-label flex items-center gap-3 p-2 rounded" style="cursor:pointer;">
-  <input type="checkbox" name="amenities[]" value="2" class="amenity-checkbox" style="margin:0;">
-  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary)">
-    <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-    <rect width="20" height="14" x="2" y="6" rx="2"></rect>
-  </svg>
-  <span>Escritorio</span>
-</label>
 
-<label class="amenity-label flex items-center gap-3 p-2 rounded" style="cursor:pointer;">
-  <input type="checkbox" name="amenities[]" value="3" class="amenity-checkbox" style="margin:0;">
-  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary)">
-    <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
-    <path d="m3.3 7 8.7 5 8.7-5"></path>
-    <path d="M12 22V12"></path>
-  </svg>
-  <span>Closet</span>
-</label>
 
-<label class="amenity-label flex items-center gap-3 p-2 rounded" style="cursor:pointer;">
-  <input type="checkbox" name="amenities[]" value="4" class="amenity-checkbox" style="margin:0;">
-  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary)">
-    <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"></path>
-  </svg>
-  <span>Calefacción</span>
-</label>
 
-<label class="amenity-label flex items-center gap-3 p-2 rounded" style="cursor:pointer;">
-  <input type="checkbox" name="amenities[]" value="5" class="amenity-checkbox" style="margin:0;">
-  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary)">
-    <path d="M17 21a1 1 0 0 0 1-1v-5.35c0-.457.316-.844.727-1.041a4 4 0 0 0-2.134-7.589 5 5 0 0 0-9.186 0 4 4 0 0 0-2.134 7.588c.411.198.727.585.727 1.041V20a1 1 0 0 0 1 1Z"></path>
-    <path d="M6 17h12"></path>
-  </svg>
-  <span>Cocina</span>
-</label>
+<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:1rem; background:var(--muted); padding:1.25rem; border-radius:var(--radius);">
+  @for ($idAmenity = 1; $idAmenity <= 12; $idAmenity++)
+    @php
+      $labelAmenity = match($idAmenity) {
+        1  => 'Wi-Fi',
+        2  => 'Escritorio',
+        3  => 'Closet',
+        4  => 'Calefacción',
+        5  => 'Cocina',
+        6  => 'Baño Privado',
+        7  => 'Lavandería',
+        8  => 'Parqueadero',
+        9  => 'Sala Común',
+        10 => 'Jardín',
+        11 => 'Gimnasio',
+        12 => 'Sala de Estudio',
+        default => 'Servicio',
+      };
+    @endphp
 
-<label class="amenity-label flex items-center gap-3 p-2 rounded" style="cursor:pointer;">
-  <input type="checkbox" name="amenities[]" value="6" class="amenity-checkbox" style="margin:0;">
-  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary)">
-    <path d="M10 4 8 6"></path>
-    <path d="M17 19v2"></path>
-    <path d="M2 12h20"></path>
-    <path d="M7 19v2"></path>
-    <path d="M9 5 7.621 3.621A2.121 2.121 0 0 0 4 5v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"></path>
-  </svg>
-  <span>Baño Privado</span>
-</label>
+    <label class="amenity-label flex items-center gap-3 p-2 rounded" style="cursor:pointer;">
+      <input
+        type="checkbox"
+        name="amenities[]"
+        value="{{ $idAmenity }}"
+        class="amenity-checkbox"
+        style="margin:0;"
+        {{ in_array($idAmenity, old('amenities', $amenitiesSeleccionadas ?? [])) ? 'checked' : '' }}
+      >
 
-<label class="amenity-label flex items-center gap-3 p-2 rounded" style="cursor:pointer;">
-  <input type="checkbox" name="amenities[]" value="7" class="amenity-checkbox" style="margin:0;">
-  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary)">
-    <path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"></path>
-  </svg>
-  <span>Lavandería</span>
-</label>
+      {{-- Ícono según el ID, mismos que enviaste --}}
+      @switch($idAmenity)
+        @case(1) {{-- Wi-Fi --}}
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" style="color:var(--primary)">
+            <path d="M12 20h.01"></path>
+            <path d="M2 8.82a15 15 0 0 1 20 0"></path>
+            <path d="M5 12.859a10 10 0 0 1 14 0"></path>
+            <path d="M8.5 16.429a5 5 0 0 1 7 0"></path>
+          </svg>
+          @break
 
-<label class="amenity-label flex items-center gap-3 p-2 rounded" style="cursor:pointer;">
-  <input type="checkbox" name="amenities[]" value="8" class="amenity-checkbox" style="margin:0;">
-  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary)">
-    <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path>
-    <circle cx="7" cy="17" r="2"></circle>
-    <path d="M9 17h6"></path>
-    <circle cx="17" cy="17" r="2"></circle>
-  </svg>
-  <span>Parqueadero</span>
-</label>
+        @case(2) {{-- Escritorio --}}
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" style="color:var(--primary)">
+            <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            <rect width="20" height="14" x="2" y="6" rx="2"></rect>
+          </svg>
+          @break
 
-<label class="amenity-label flex items-center gap-3 p-2 rounded" style="cursor:pointer;">
-  <input type="checkbox" name="amenities[]" value="9" class="amenity-checkbox" style="margin:0;">
-  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary)">
-    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-    <path d="M16 3.128a4 4 0 0 1 0 7.744"></path>
-    <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-    <circle cx="9" cy="7" r="4"></circle>
-  </svg>
-  <span>Sala Común</span>
-</label>
+        @case(3) {{-- Closet --}}
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" style="color:var(--primary)">
+            <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
+            <path d="m3.3 7 8.7 5 8.7-5"></path>
+            <path d="M12 22V12"></path>
+          </svg>
+          @break
 
-<label class="amenity-label flex items-center gap-3 p-2 rounded" style="cursor:pointer;">
-  <input type="checkbox" name="amenities[]" value="10" class="amenity-checkbox" style="margin:0;">
-  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary)">
-    <path d="M10 10v.2A3 3 0 0 1 8.9 16H5a3 3 0 0 1-1-5.8V10a3 3 0 0 1 6 0Z"></path>
-    <path d="M7 16v6"></path>
-    <path d="M13 19v3"></path>
-    <path d="M12 19h8.3a1 1 0 0 0 .7-1.7L18 14h.3a1 1 0 0 0 .7-1.7L16 9h.2a1 1 0 0 0 .8-1.7L13 3l-1.4 1.5"></path>
-  </svg>
-  <span>Jardín</span>
-</label>
+        @case(4) {{-- Calefacción --}}
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" style="color:var(--primary)">
+            <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"></path>
+          </svg>
+          @break
 
-<label class="amenity-label flex items-center gap-3 p-2 rounded" style="cursor:pointer;">
-  <input type="checkbox" name="amenities[]" value="11" class="amenity-checkbox" style="margin:0;">
-  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary)">
-    <path d="M17.596 12.768a2 2 0 1 0 2.829-2.829l-1.768-1.767a2 2 0 0 0 2.828-2.829l-2.828-2.828a2 2 0 0 0-2.829 2.828l-1.767-1.768a2 2 0 1 0-2.829 2.829z"></path>
-    <path d="m2.5 21.5 1.4-1.4"></path>
-    <path d="m20.1 3.9 1.4-1.4"></path>
-    <path d="M5.343 21.485a2 2 0 1 0 2.829-2.828l1.767 1.768a2 2 0 1 0 2.829-2.829l-6.364-6.364a2 2 0 1 0-2.829 2.829l1.768 1.767a2 2 0 0 0-2.828 2.829z"></path>
-    <path d="m9.6 14.4 4.8-4.8"></path>
-  </svg>
-  <span>Gimnasio</span>
-</label>
+        @case(5) {{-- Cocina --}}
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" style="color:var(--primary)">
+            <path d="M17 21a1 1 0 0 0 1-1v-5.35c0-.457.316-.844.727-1.041a4 4 0 0 0-2.134-7.589 5 5 0 0 0-9.186 0 4 4 0 0 0-2.134 7.588c.411.198.727.585.727 1.041V20a1 1 0 0 0 1 1Z"></path>
+            <path d="M6 17h12"></path>
+          </svg>
+          @break
 
-<label class="amenity-label flex items-center gap-3 p-2 rounded" style="cursor:pointer;">
-  <input type="checkbox" name="amenities[]" value="12" class="amenity-checkbox" style="margin:0;">
-  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary)">
-    <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"></path>
-  </svg>
-  <span>Sala de Estudio</span>
-</label>
-                </div>
+        @case(6) {{-- Baño Privado --}}
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" style="color:var(--primary)">
+            <path d="M10 4 8 6"></path>
+            <path d="M17 19v2"></path>
+            <path d="M2 12h20"></path>
+            <path d="M7 19v2"></path>
+            <path d="M9 5 7.621 3.621A2.121 2.121 0 0 0 4 5v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"></path>
+          </svg>
+          @break
+
+        @case(7) {{-- Lavandería --}}
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" style="color:var(--primary)">
+            <path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"></path>
+          </svg>
+          @break
+
+        @case(8) {{-- Parqueadero --}}
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" style="color:var(--primary)">
+            <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path>
+            <circle cx="7" cy="17" r="2"></circle>
+            <path d="M9 17h6"></path>
+            <circle cx="17" cy="17" r="2"></circle>
+          </svg>
+          @break
+
+        @case(9) {{-- Sala Común --}}
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" style="color:var(--primary)">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+            <path d="M16 3.128a4 4 0 0 1 0 7.744"></path>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+          </svg>
+          @break
+
+        @case(10) {{-- Jardín --}}
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" style="color:var(--primary)">
+            <path d="M10 10v.2A3 3 0 0 1 8.9 16H5a3 3 0 0 1-1-5.8V10a3 3 0 0 1 6 0Z"></path>
+            <path d="M7 16v6"></path>
+            <path d="M13 19v3"></path>
+            <path d="M12 19h8.3a1 1 0 0 0 .7-1.7L18 14h.3a1 1 0 0 0 .7-1.7L16 9h.2a1 1 0 0 0 .8-1.7L13 3l-1.4 1.5"></path>
+          </svg>
+          @break
+
+        @case(11) {{-- Gimnasio --}}
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" style="color:var(--primary)">
+            <path d="M17.596 12.768a2 2 0 1 0 2.829-2.829l-1.768-1.767a2 2 0 0 0 2.828-2.829l-2.828-2.828a2 2 0 0 0-2.829 2.828l-1.767-1.768a2 2 0 1 0-2.829 2.829z"></path>
+            <path d="m2.5 21.5 1.4-1.4"></path>
+            <path d="m20.1 3.9 1.4-1.4"></path>
+            <path d="M5.343 21.485a2 2 0 1 0 2.829-2.828l1.767 1.768a2 2 0 1 0 2.829-2.829l-6.364-6.364a2 2 0 1 0-2.829 2.829l1.768 1.767a2 2 0 0 0-2.828 2.829z"></path>
+            <path d="m9.6 14.4 4.8-4.8"></path>
+          </svg>
+          @break
+
+        @case(12) {{-- Sala de Estudio --}}
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" style="color:var(--primary)">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"></path>
+          </svg>
+          @break
+      @endswitch
+
+      <span>{{ $labelAmenity }}</span>
+    </label>
+  @endfor
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                 <small style="color:var(--muted-foreground); display:block; margin-top:0.5rem;">
                   Selecciona todos los servicios que incluye tu habitación
                 </small>
               </div>
 
-              {{-- Información de contacto --}}
+              {{-- Imágenes --}}
+              <div class="mb-8 mt-6">
+                <h3 class="mb-4 text-[var(--primary)] flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                       viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                       stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <path d="M21 15l-5-5L5 21"></path>
+                  </svg>
+                  Imágenes de la habitación
+                </h3>
+
+                {{-- Imágenes actuales --}}
+                @php
+                  $imagenesActuales = $pension->link_foto ?? [];
+                  if (!is_array($imagenesActuales)) {
+                    $imagenesActuales = [];
+                  }
+                @endphp
+
+                @if(count($imagenesActuales))
+                  <div class="mb-4">
+                    <p class="text-sm text-gray-600 mb-2">Imágenes actuales:</p>
+                    <div class="flex flex-wrap gap-3">
+                      @foreach($imagenesActuales as $img)
+                        <img src="{{ $img }}"
+                             alt="Imagen actual"
+                             class="w-24 h-24 object-cover rounded-lg border">
+                      @endforeach
+                    </div>
+                  </div>
+                @endif
+
+                <input type="file" id="imagenes" name="imagenes[]" multiple accept="image/*" class="input">
+                <small style="color:var(--muted-foreground);">
+                  Puedes subir nuevas imágenes (JPG, PNG, WEBP). Si subes nuevas, se actualizarán junto con la publicación.
+                </small>
+
+                <div id="preview" class="flex flex-wrap gap-3 mt-4"></div>
+              </div>
+
+              {{-- (Opcional) Estado de la publicación --}}
               <div class="mb-8">
                 <h3 class="mb-4 text-[var(--primary)] flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
                        stroke-width="2">
-                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 8v8"></path>
+                    <path d="M8 12h8"></path>
                   </svg>
-                  Información de Contacto
+                  Estado de la publicación
                 </h3>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label for="owner-name" class="block text-sm font-medium mb-2">
-                      Nombre completo *
-                    </label>
-                    <input id="owner-name" name="name_user" class="input" type="text"
-                           placeholder="Tu nombre completo"
-                           value="{{ $usuario->name }}" readonly>
-                  </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <label class="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="id_estado"
+                      value="1"
+                      {{ (int)old('id_estado', $pension->id_estado ?? 1) === 1 ? 'checked' : '' }}
+                    >
+                    <span>Borrador (no visible para estudiantes)</span>
+                  </label>
 
-                  <div>
-                    <label for="owner-email" class="block text-sm font-medium mb-2">
-                      Email *
-                    </label>
-                    <input id="owner-email" name="email" class="input" type="email"
-                           placeholder="tu@email.com"
-                           value="{{ $usuario->email }}" readonly>
-                    <small style="color:var(--muted-foreground);">
-                      Los estudiantes te contactarán por este email
-                    </small>
-                  </div>
-
-                  <div class="md:col-span-2">
-                    <label for="owner-phone" class="block text-sm font-medium mb-2">
-                      Teléfono *
-                    </label>
-                    <input id="owner-phone" name="telefono" class="input" type="tel"
-                           placeholder="+57 300 123 4567"
-                           value="{{ $usuario->telefono->numero ?? '' }}" readonly>
-                    <small style="color:var(--muted-foreground);">
-                      Incluye código de país (+57)
-                    </small>
-                  </div>
+                  <label class="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="id_estado"
+                      value="2"
+                      {{ (int)old('id_estado', $pension->id_estado ?? 2) === 2 ? 'checked' : '' }}
+                    >
+                    <span>Publicada (visible para estudiantes)</span>
+                  </label>
                 </div>
-
-                {{-- Imágenes --}}
-                <div class="mb-8 mt-6">
-                  <h3 class="mb-4 text-[var(--primary)] flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
-                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                         stroke-width="2">
-                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                      <circle cx="8.5" cy="8.5" r="1.5"/>
-                      <path d="M21 15l-5-5L5 21"></path>
-                    </svg>
-                    Imágenes de la habitación
-                  </h3>
-
-                  <input type="file" id="imagenes" name="imagenes[]" multiple accept="image/*" class="input">
-                  <small style="color:var(--muted-foreground);">
-                    Puedes subir varias imágenes (JPG, PNG, WEBP)
-                  </small>
-
-                  <div id="preview" class="flex flex-wrap gap-3 mt-4"></div>
-                </div>
-              </div>
-
-              {{-- Términos --}}
-              <div class="mb-8 p-5" style="background:var(--muted); border-radius:var(--radius);">
-                <label style="display:flex; gap:0.75rem; align-items:flex-start; cursor:pointer;">
-                  <input type="checkbox" id="accept-terms" required style="margin-top:0.3rem;">
-                  <div>
-                    <strong>Acepto los términos y condiciones</strong>
-                    <p style="margin:0.5rem 0 0; color:var(--muted-foreground); font-size:0.9rem;">
-                      Al publicar mi habitación, confirmo que la información es veraz y autorizo a RoomFinder a verificar los datos proporcionados.
-                      <a href="#" style="color:var(--primary)">Leer términos completos</a>
-                    </p>
-                  </div>
-                </label>
               </div>
 
               {{-- Acciones --}}
               <div class="flex justify-center gap-4 flex-wrap">
-                <input type="hidden" name="id_estado" id="id_estado" value="1">
-
-                <button type="button" class="btn btn-outline"
-                        onclick="document.getElementById('id_estado').value=1; this.form.submit();">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                       viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                       stroke-width="2">
-                    <path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"></path>
-                    <path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"></path>
-                  </svg>
-                  Guardar Borrador
-                </button>
-
-                <button type="submit" class="btn btn-primary"
-                        onclick="document.getElementById('id_estado').value=2;">
+                <button type="submit" class="btn btn-primary">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
                        stroke-width="2">
                     <path d="M20 6 9 17l-5-5"></path>
                   </svg>
-                  Publicar Habitación
+                  Guardar cambios
                 </button>
+
+                <a href="{{ route('propietario.habitaciones') }}" class="btn btn-outline">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                       viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                       stroke-width="2">
+                    <path d="M15 18l-6-6 6-6"></path>
+                  </svg>
+                  Volver a mis habitaciones
+                </a>
               </div>
             </form>
           </div>
@@ -685,7 +810,6 @@
     <div class="max-w-7xl mx-auto px-6 py-16">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
 
-        <!-- Logo / descripción -->
         <div>
           <h3 class="text-white font-semibold mb-3">UniRooms</h3>
           <p class="text-gray-400 leading-relaxed">
@@ -694,7 +818,6 @@
           </p>
         </div>
 
-        <!-- Zonas -->
         <div>
           <h4 class="text-white font-semibold mb-3">Zonas Disponibles</h4>
           <ul class="space-y-2 text-gray-400">
@@ -704,7 +827,6 @@
           </ul>
         </div>
 
-        <!-- Servicios -->
         <div>
           <h4 class="text-white font-semibold mb-3">Servicios</h4>
           <ul class="space-y-2 text-gray-400">
@@ -716,7 +838,6 @@
           </ul>
         </div>
 
-        <!-- Contacto -->
         <div>
           <h4 class="text-white font-semibold mb-3">Contacto</h4>
           <div class="text-gray-400 space-y-3">
@@ -767,7 +888,6 @@
     document.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
 
-      // Dropdown usuario
       const userMenuBtn = document.getElementById('userMenuBtn');
       const dropdown = document.getElementById('userDropdown');
 
@@ -783,7 +903,6 @@
         });
       }
 
-      // Menú móvil: ocultar/mostrar nav secundaria
       const mobileMenuBtn = document.getElementById('mobileMenuBtn');
       const navSecondary = document.querySelector('.navigation');
 
@@ -802,11 +921,11 @@
           alert.style.transition = "opacity 0.5s";
           alert.style.opacity = '0';
           setTimeout(() => alert.remove(), 500);
-        }, 20000); // 20 segundos
+        }, 20000);
       });
     });
 
-    // Preview imágenes
+    // Preview imágenes nuevas
     const input = document.getElementById('imagenes');
     const preview = document.getElementById('preview');
     if (input) {

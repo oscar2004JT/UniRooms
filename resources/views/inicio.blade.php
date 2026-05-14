@@ -139,10 +139,12 @@
           Conectamos estudiantes con alojamientos verificados en las mejores zonas universitarias de Medellín
         </p>
         <div class="hero-buttons flex flex-wrap justify-center gap-4">
-          <button id="btn-search-rooms" class="btn btn-primary btn-lg bg-white text-blue-900 font-semibold px-6 py-3 rounded-lg inline-flex items-center gap-2">
+        <form action="{{ route('buscarroom') }}" method="get">
+          <button type="submit" id="btn-search-rooms" class="btn btn-primary btn-lg bg-white text-blue-900 font-semibold px-6 py-3 rounded-lg inline-flex items-center gap-2">
             <i data-lucide="search" class="inline"></i>
             Buscar Habitaciones
           </button>
+        </form>
 
           <form action="{{ route('addroom') }}" method="get">
     <button type="submit" 

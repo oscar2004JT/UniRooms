@@ -26,6 +26,11 @@ class Pension extends Model
         'id_estado',
         'descripcion',
     ];
+    
+    protected $casts = [
+        'link_foto' => 'array',
+    ];
+
 
 
     /**
